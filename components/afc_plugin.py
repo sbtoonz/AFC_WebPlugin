@@ -14,7 +14,7 @@ class AFCPlugin(Plugin):
     def __init__(self, config):
         super().__init__(config)
 
-        afc_directory = config.get('module_directory', '/home/pi/klipper/klippy/extras')
+        afc_directory = config.get('module_directory', '~/klipper/klippy/extras')
         afc_path = os.path.join(afc_directory, "AFC.py")
         spec = importlib.util.spec_from_file_location("afc", afc_path)
         afc_module = importlib.util.module_from_spec(spec)
