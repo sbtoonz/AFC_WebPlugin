@@ -2,17 +2,17 @@
 
 # Define paths
 PLUGIN_SRC="moonraker/components/afc_plugin.py"
-PLUGIN_DST="~/moonraker/components/afc_plugin.py"
+PLUGIN_DST="$HOME/moonraker/components/afc_plugin.py"
 MAINSAIL_SRC="MainsailworkingCopy.zip"
 FLUIDD_SRC="FluiddworkingCopy.zip"
-MAINSAIL_DST="~/mainsail"
-FLUIDD_DST="~/fluidd"
-MOONRAKER_CONF="~/printer_data/config/moonraker.conf"
+MAINSAIL_DST="$HOME/mainsail"
+FLUIDD_DST="$HOME/fluidd"
+MOONRAKER_CONF="$HOME/printer_data/config/moonraker.conf"
 
 # Symlink afc_plugin.py
 if [ -e "$PLUGIN_SRC" ]; then
     echo "Creating symlink for afc_plugin.py..."
-    ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
+    mkdir -p "$HOME/moonraker/components" && ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
     echo "Symlink created."
 else
     echo "Error: $PLUGIN_SRC not found. Aborting."
@@ -38,7 +38,7 @@ if [ "$USER_CHOICE" == "m" ] || [ "$USER_CHOICE" == "M" ]; then
             mv "$MAINSAIL_DST" "${MAINSAIL_DST}.old"
         fi
         echo "Unzipping MainsailworkingCopy.zip to ~/mainsail..."
-        unzip -o "$MAINSAIL_SRC" -d "$MAINSAIL_DST"
+        mkdir -p "$MAINSAIL_DST" && unzip -o "$MAINSAIL_SRC" -d "$MAINSAIL_DST"
         echo "Unzip complete."
     else
         echo "Error: $MAINSAIL_SRC not found. Aborting."
@@ -52,7 +52,7 @@ elif [ "$USER_CHOICE" == "f" ] || [ "$USER_CHOICE" == "F" ]; then
             mv "$FLUIDD_DST" "${FLUIDD_DST}.old"
         fi
         echo "Unzipping FluiddworkingCopy.zip to ~/fluidd..."
-        unzip -o "$FLUIDD_SRC" -d "$FLUIDD_DST"
+        mkdir -p "$FLUIDD_DST" && unzip -o "$FLUIDD_SRC" -d "$FLUIDD_DST"
         echo "Unzip complete."
     else
         echo "Error: $FLUIDD_SRC not found. Aborting."
@@ -80,7 +80,7 @@ fi
 # Create a symbolic link for afc_plugin.py to Moonraker directory
 if [ -e "$PLUGIN_DST" ]; then
     echo "Creating symbolic link for afc_plugin.py in Moonraker directory..."
-    ln -sf "$PLUGIN_SRC" "$PLUGIN_DST"
+    ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
     echo "Symbolic link created."
 else
     echo "Error: $PLUGIN_DST not found. Aborting."
