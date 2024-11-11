@@ -77,4 +77,14 @@ else
     exit 1
 fi
 
+# Create a symbolic link for afc_plugin.py to Moonraker directory
+if [ -e "$PLUGIN_DST" ]; then
+    echo "Creating symbolic link for afc_plugin.py in Moonraker directory..."
+    ln -sf "$PLUGIN_SRC" "$PLUGIN_DST"
+    echo "Symbolic link created."
+else
+    echo "Error: $PLUGIN_DST not found. Aborting."
+    exit 1
+fi
+
 echo "Installation complete."
