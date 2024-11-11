@@ -54,12 +54,18 @@ class AFCPlugin:
             try:
                 spoolman_url = f"http://{self.spoolman_ip}:{self.spoolman_port}/api/v1/spool"
                 spools_response = await client.get(spoolman_url)
+
                 if spools_response.status_code == 200:
                     spools_data = spools_response.json()
+                    logger.info(f"Successfully retrieved spools data from Spoolman: {spools_data}")
+
+                    # Create a dictionary by ID for easier lookup
                     spools_by_id = {str(spool["id"]): spool for spool in spools_data}
                 else:
                     logger.error(f"Failed to retrieve spools from Spoolman, HTTP {spools_response.status_code}")
                     spools_by_id = {}
+                    logger.error("Spoolman response: " + spools_response.text)
+
             except Exception as e:
                 logger.error(f"Failed to retrieve spools data from SpoolManager: {e}")
                 spools_by_id = {}
@@ -72,16 +78,30 @@ class AFCPlugin:
                 enriched_data[unit] = {}
                 for lane, spool_info in lanes.items():
                     enriched_spool_info = spool_info.copy()
-                    spool_id = spool_info.get("spool_id")
+                    spool_id = str(spool_info.get("spool_id"))
 
                     if spool_id and spool_id in spools_by_id:
                         spoolman_data = spools_by_id[spool_id]
+                        logger.info(f"Enriching spool {spool_id} with data: {spoolman_data}")
+
+                        # Access the nested filament object
+                        filament_data = spoolman_data.get("filament", {})
+                        material = filament_data.get("material")
+                        color = filament_data.get("color_hex")
+                        remaining_weight = spoolman_data.get("remaining_weight")
+                        notes = spoolman_data.get("notes")
+
+                        logger.info(f"Material: {material}, Color: {color}, Remaining Weight: {remaining_weight}, Notes: {notes}")
+
                         enriched_spool_info.update({
-                            "material": spoolman_data.get("material"),
-                            "remaining_weight": spoolman_data.get("remaining_weight"),
-                            "color": spoolman_data.get("color"),
-                            "notes": spoolman_data.get("notes"),
+                            "material": material,
+                            "remaining_weight": remaining_weight,
+                            "color": color,
+                            "notes": notes,
                         })
+
+                    else:
+                        logger.warning(f"No matching spool found for spool_id: {spool_id}")
 
                     enriched_data[unit][lane] = enriched_spool_info
 
