@@ -1,66 +1,83 @@
-<div id="afc-spools-panel" style="padding: 10px;">
-    <h3>AFC Spools Status</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFC Spools</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #spools-container {
+            display: flex;
+            gap: 10px;
+        }
+        .spool {
+            flex: 1;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .spool h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .spool p {
+            margin: 5px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>AFC Spools</h1>
     <div id="spools-container">
-        <div class="spool" id="spool1"></div>
-        <div class="spool" id="spool2"></div>
-        <div class="spool" id="spool3"></div>
-        <div class="spool" id="spool4"></div>
+        <div id="spool1" class="spool"></div>
+        <div id="spool2" class="spool"></div>
+        <div id="spool3" class="spool"></div>
+        <div id="spool4" class="spool"></div>
     </div>
-</div>
 
-<script>
-async function fetchSpoolData() {
-    try {
-        const response = await fetch("/server/afc/spools");
-        const data = await response.json();
-        if (data.status === "success" && data.spools) {
-            for (let [index, spool] of Object.entries(data.spools)) {
-                if (index !== "system") {
-                    for (let lane in spool) {
-                        const spoolDiv = document.getElementById(`spool${parseInt(lane) + 1}`);
-                        if (spoolDiv) {
-                            spoolDiv.innerHTML = `
-                                <h4>Spool ${lane}</h4>
-                                <p><strong>Material:</strong> ${spool[lane].material || "N/A"}</p>
-                                <p><strong>Color:</strong> ${spool[lane].color || "N/A"}</p>
-                                <p><strong>Remaining Length:</strong> ${spool[lane].remaining_weight || "N/A"} m</p>
-                                <p><strong>Status:</strong> ${spool[lane].load ? "Loaded" : "Not Loaded"}</p>
-                            `;
+    <script>
+        async function fetchSpoolData() {
+            try {
+                const response = await fetch("/server/afc/spools");
+                const data = await response.json();
+                if (data.status === "success" && data.spools) {
+                    for (let [unit, spool] of Object.entries(data.spools)) {
+                        if (unit !== "system") {
+                            for (let lane in spool) {
+                                const spoolDiv = document.getElementById(`spool${parseInt(lane) + 1}`);
+                                if (spoolDiv) {
+                                    spoolDiv.innerHTML = `
+                                        <h4>Spool ${lane}</h4>
+                                        <p><strong>Material:</strong> ${spool[lane].material || "N/A"}</p>
+                                        <p><strong>Color:</strong> ${spool[lane].color || "N/A"}</p>
+                                        <p><strong>Remaining Weight:</strong> ${spool[lane].remaining_weight || "N/A"} g</p>
+                                        <p><strong>Status:</strong> ${spool[lane].load ? "Loaded" : "Not Loaded"}</p>
+                                        <p><strong>Notes:</strong> ${spool[lane].notes || "N/A"}</p>
+                                    `;
+                                }
+                            }
                         }
                     }
                 }
+            } catch (error) {
+                console.error("Error fetching AFC spool data:", error);
             }
         }
-    } catch (error) {
-        console.error("Error fetching AFC spool data:", error);
-    }
-}
 
-fetchSpoolData();
-setInterval(fetchSpoolData, 10000);
-</script>
-
-<style>
-#spools-container {
-    display: flex;
-    gap: 10px;
-}
-
-.spool {
-    flex: 1;
-    padding: 15px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.spool h4 {
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.spool p {
-    margin: 5px 0;
-    color: #666;
-}
-</style>
+        // Fetch spool data when the page loads
+        window.onload = fetchSpoolData;
+    </script>
+</body>
+</html>
