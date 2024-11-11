@@ -87,4 +87,14 @@ else
     exit 1
 fi
 
+# Install httpx using pip
+echo "Installing httpx using pip..."
+~/moonraker-env/bin/pip install httpx
+if [ $? -eq 0 ]; then
+    echo "httpx installed successfully."
+else
+    echo "Error installing httpx. Aborting."
+    exit 1
+fi
+
 echo "Installation complete."
