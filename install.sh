@@ -12,7 +12,7 @@ MOONRAKER_CONF="$HOME/printer_data/config/moonraker.conf"
 # Symlink afc_plugin.py
 if [ -e "$PLUGIN_SRC" ]; then
     echo "Creating symlink for afc_plugin.py..."
-    mkdir -p "$HOME/moonraker/components" && ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
+    mkdir -p "$HOME/moonraker/components" && mkdir -p "$HOME/moonraker/components" && ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
     echo "Symlink created."
 else
     echo "Error: $PLUGIN_SRC not found. Aborting."
@@ -38,7 +38,7 @@ if [ "$USER_CHOICE" == "m" ] || [ "$USER_CHOICE" == "M" ]; then
             mv "$MAINSAIL_DST" "${MAINSAIL_DST}.old"
         fi
         echo "Unzipping MainsailworkingCopy.zip to ~/mainsail..."
-        mkdir -p "$MAINSAIL_DST" && unzip -o "$MAINSAIL_SRC" -d "$MAINSAIL_DST"
+        mkdir -p "$HOME/mainsail" && unzip -o "$MAINSAIL_SRC" -d "$MAINSAIL_DST"
         echo "Unzip complete."
     else
         echo "Error: $MAINSAIL_SRC not found. Aborting."
@@ -52,7 +52,7 @@ elif [ "$USER_CHOICE" == "f" ] || [ "$USER_CHOICE" == "F" ]; then
             mv "$FLUIDD_DST" "${FLUIDD_DST}.old"
         fi
         echo "Unzipping FluiddworkingCopy.zip to ~/fluidd..."
-        mkdir -p "$FLUIDD_DST" && unzip -o "$FLUIDD_SRC" -d "$FLUIDD_DST"
+        mkdir -p "$HOME/fluidd" && unzip -o "$FLUIDD_SRC" -d "$FLUIDD_DST"
         echo "Unzip complete."
     else
         echo "Error: $FLUIDD_SRC not found. Aborting."
@@ -64,23 +64,23 @@ else
 fi
 
 # Modify moonraker.cfg to add afc_plugin configuration
-if [ -e "$MOONRAKER_CONF" ]; then
-    if ! grep -q "\[afc_plugin\]" "$MOONRAKER_CONF"; then
+if [ -e "$HOME/printer_data/config/moonraker.conf" ]; then
+    if ! grep -q "\[afc_plugin\]" "$HOME/printer_data/config/moonraker.conf"; then
         echo "Modifying moonraker.cfg to add afc_plugin configuration..."
-        sed -i '/\[update_manager\]/a\[afc_plugin]\nspoolman_port: 7912\nspoolman_ip: localhost' "$MOONRAKER_CONF"
+        sed -i '/\[update_manager\]/a\[afc_plugin]\nspoolman_port: 7912\nspoolman_ip: localhost' "$HOME/printer_data/config/moonraker.conf"
         echo "moonraker.cfg modified."
     else
         echo "afc_plugin configuration already exists. Skipping modification."
     fi
 else
-    echo "Error: $MOONRAKER_CONF not found. Aborting."
+    echo "Error: $HOME/printer_data/config/moonraker.conf not found. Aborting."
     exit 1
 fi
 
 # Create a symbolic link for afc_plugin.py to Moonraker directory
 if [ -e "$PLUGIN_DST" ]; then
     echo "Creating symbolic link for afc_plugin.py in Moonraker directory..."
-    ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
+    mkdir -p "$HOME/moonraker/components" && ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
     echo "Symbolic link created."
 else
     echo "Error: $PLUGIN_DST not found. Aborting."
