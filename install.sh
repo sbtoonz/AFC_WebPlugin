@@ -7,6 +7,7 @@ MAINSAIL_SRC="MainsailworkingCopy.zip"
 FLUIDD_SRC="FluiddworkingCopy.zip"
 MAINSAIL_DST="~/mainsail"
 FLUIDD_DST="~/fluidd"
+MOONRAKER_CFG="~/printer_data/config/moonraker.cfg"
 
 # Symlink afc_plugin.py
 if [ -e "$PLUGIN_SRC" ]; then
@@ -59,6 +60,16 @@ elif [ "$USER_CHOICE" == "f" ] || [ "$USER_CHOICE" == "F" ]; then
     fi
 else
     echo "Invalid choice. Aborting."
+    exit 1
+fi
+
+# Modify moonraker.cfg to add afc_plugin configuration
+if [ -e "$MOONRAKER_CFG" ]; then
+    echo "Modifying moonraker.cfg to add afc_plugin configuration..."
+    sed -i '/\[update_manager\]/a\[afc_plugin]\nspoolman_port: 7912\nspoolman_ip: localhost' "$MOONRAKER_CFG"
+    echo "moonraker.cfg modified."
+else
+    echo "Error: $MOONRAKER_CFG not found. Aborting."
     exit 1
 fi
 

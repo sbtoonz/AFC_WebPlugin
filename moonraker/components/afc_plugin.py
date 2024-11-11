@@ -9,6 +9,7 @@ class AFCPlugin:
     def __init__(self, config):
         self.server = config.get_server()
         self.spoolman_port = config.get('spoolman_port', 7912)
+        self.spoolman_ip = config.get('spoolman_ip', 'localhost')  # Add the IP configuration
 
         self._register_endpoints()
 
@@ -51,7 +52,7 @@ class AFCPlugin:
 
         async with httpx.AsyncClient() as client:
             try:
-                spoolman_url = f"http://localhost:{self.spoolman_port}/api/v1/spool"
+                spoolman_url = f"http://{self.spoolman_ip}:{self.spoolman_port}/api/v1/spool"
                 spools_response = await client.get(spoolman_url)
                 if spools_response.status_code == 200:
                     spools_data = spools_response.json()
