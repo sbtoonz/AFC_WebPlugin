@@ -38,7 +38,7 @@ if [ "$USER_CHOICE" == "m" ] || [ "$USER_CHOICE" == "M" ]; then
             mv "$MAINSAIL_DST" "${MAINSAIL_DST}.old"
         fi
         echo "Unzipping MainsailworkingCopy.zip to ~/mainsail..."
-        mkdir -p "$HOME/mainsail" && unzip -o "$MAINSAIL_SRC" -d "$MAINSAIL_DST"
+        unzip -o "$MAINSAIL_SRC" -d "$MAINSAIL_DST"
         echo "Unzip complete."
     else
         echo "Error: $MAINSAIL_SRC not found. Aborting."
@@ -52,7 +52,7 @@ elif [ "$USER_CHOICE" == "f" ] || [ "$USER_CHOICE" == "F" ]; then
             mv "$FLUIDD_DST" "${FLUIDD_DST}.old"
         fi
         echo "Unzipping FluiddworkingCopy.zip to ~/fluidd..."
-        mkdir -p "$HOME/fluidd" && unzip -o "$FLUIDD_SRC" -d "$FLUIDD_DST"
+        unzip -o "$FLUIDD_SRC" -d "$FLUIDD_DST"
         echo "Unzip complete."
     else
         echo "Error: $FLUIDD_SRC not found. Aborting."
@@ -80,7 +80,7 @@ fi
 # Create a symbolic link for afc_plugin.py to Moonraker directory
 if [ -e "$PLUGIN_DST" ]; then
     echo "Creating symbolic link for afc_plugin.py in Moonraker directory..."
-    mkdir -p "$HOME/moonraker/components" && ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
+    ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
     echo "Symbolic link created."
 else
     echo "Error: $PLUGIN_DST not found. Aborting."
