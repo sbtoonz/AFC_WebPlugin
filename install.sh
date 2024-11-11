@@ -12,7 +12,7 @@ MOONRAKER_CONF="$HOME/printer_data/config/moonraker.conf"
 # Symlink afc_plugin.py
 if [ -e "$PLUGIN_SRC" ]; then
     echo "Creating symlink for afc_plugin.py..."
-    mkdir -p "$HOME/moonraker/components" && mkdir -p "$HOME/moonraker/components" && ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
+    ln -sf "$PWD/$PLUGIN_SRC" "$PLUGIN_DST"
     echo "Symlink created."
 else
     echo "Error: $PLUGIN_SRC not found. Aborting."
