@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 class AFCPlugin:
     def __init__(self, config):
         self.server = config.get_server()
+        self.spoolman_enabled = config.get('spoolman_enabled', True)
         self.spoolman_port = config.get('spoolman_port', 7912)
         self.spoolman_ip = config.get('spoolman_ip', 'localhost')  # Add the IP configuration
 
@@ -33,7 +34,10 @@ class AFCPlugin:
                 afc_status = result.get("status", {}).get("AFC", {})
 
                 if isinstance(afc_status, dict):
-                    enriched_spools_data = await self._enrich_with_spoolman(afc_status)
+                    if self.spoolman_enabled:
+                        enriched_spools_data = await self._enrich_with_spoolman(afc_status)
+                    else:
+                        enriched_spools_data = afc_status
                     return {"status": "success", "spools": enriched_spools_data}
                 else:
                     logger.error("Unexpected type for afc_status. Expected dict, got: "
