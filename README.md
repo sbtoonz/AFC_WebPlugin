@@ -39,48 +39,23 @@ The AFC Plugin integrates the Armored Filament Carousel (AFC) with Moonraker and
 - **`spoolman_ip`**: The IP address where Spoolman is running. Defaults to `localhost`.
 - **`spoolman_port`**: The port on which Spoolman is running. Default is `7192`.
 
-## 2. Custom Mainsail Compilation for AFC Panel
-To display AFC information within the Mainsail UI, a custom panel needs to be added to Mainsail. This section details how to compile Mainsail with this new custom AFC panel.
+## 2. Deploying the Custom Mainsail Build for AFC Panel
+To display AFC information within the Mainsail UI, choose Mainsail during the installation process. Fluidd support coming soon.
 
-### Steps to Compile Mainsail with AFC Panel
-1. **Clone Mainsail Repository**
-   - Clone the Mainsail repository to your local machine:
+2. **Backup of Existing Mainsail**
+   - During the installation, the current version of Mainsail is backed up to ensure that you can roll back if necessary.
+   - **Backup Directory**: `/home/pi/mainsail.old`
+   - The backup allows you to restore the previous version in case of issues with the new compilation.
+
+3. **Restoring the Old Version**
+   - If needed, restore the old version of Mainsail:
      ```sh
-     git clone https://github.com/mainsail-crew/mainsail.git
-     cd mainsail
+     sudo rm -rf /var/www/mainsail
+     sudo mv /home/pi/mainsail.old /var/www/mainsail
      ```
-
-2. **Add AFC Panel**
-   - Add the `AfcPanel.vue` file to the Mainsail components:
-     - Copy `AfcPanel.vue` to `src/components/panels/`.
-     - Modify the necessary configuration in `src/index.ts` to import and register the new AFC panel component.
-
-3. **Build Mainsail**
-   - Compile Mainsail with the new AFC panel included:
-     ```sh
-     npm install
-     npm run build && npm run build.zip
-     ```
-
-4. **Deploy the Custom Mainsail Build**
-   - Upload the compiled build to your 3D printer controller (e.g., Raspberry Pi), replacing the existing Mainsail installation:
-     ```sh
-     unzip build.zip -d /var/www/mainsail
-     ```
-
-## 3. Backup Information for Existing Mainsail
-During the installation process, the current version of Mainsail is automatically backed up in the home directory to ensure that you can roll back if necessary.
-
-- **Backup Directory**: `/home/pi/mainsail.old`
-- The backup allows you to restore the previous version in case of issues with the new compilation.
-- To restore the old version:
-  ```sh
-  sudo rm -rf /var/www/mainsail
-  sudo mv /home/pi/mainsail.old /var/www/mainsail
-  ```
 
 ## Troubleshooting
-- **Panel Not Showing in Mainsail**: Ensure that you have properly registered the `AfcPanel.vue` in the `src/index.ts` file before compiling Mainsail.
+- **Panel Not Showing in Mainsail**: Ensure that the new version of Mainsail with the AFC panel has been properly deployed.
 - **Spoolman Data Not Showing**: Confirm that the `spoolman_enabled` flag is set to `true` in the Moonraker configuration file and that the Spoolman server is reachable at the specified IP and port.
 
 ## Support
