@@ -1,17 +1,25 @@
 <template>
-  <div class="afc-panel">
-    <h1>AFC Spools</h1>
-    <div id="spools-container">
-      <div v-for="(lane, index) in spoolData" :key="index" :id="`spool${index + 1}`" class="spool">
-        <h4>Spool {{ index + 1 }}</h4>
-        <p><strong>Material:</strong> {{ lane.material || "N/A" }}</p>
-        <p><strong>Color:</strong> {{ lane.color || "N/A" }}</p>
-        <p><strong>Remaining Weight:</strong> {{ lane.remaining_weight || "N/A" }} g</p>
-        <p><strong>Status:</strong> {{ lane.load ? "Loaded" : "Not Loaded" }}</p>
-        <p><strong>Notes:</strong> {{ lane.notes || "N/A" }}</p>
-      </div>
-    </div>
-  </div>
+  <v-expansion-panels>
+    <v-expansion-panel class="afc-panel-wrapper">
+      <v-expansion-panel-header>AFC Spools</v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <v-card class="afc-panel">
+          <v-card-text>
+            <div class="spool-container">
+              <div v-for="(spool, index) in spoolData" :key="index" class="spool-card">
+                <h3>Spool {{ index + 1 }}</h3>
+                <p><strong>Material:</strong> {{ spool.material }}</p>
+                <p><strong>Color:</strong> {{ spool.color }}</p>
+                <p><strong>Remaining Weight:</strong> {{ spool.remaining_weight ? spool.remaining_weight.toFixed(2) : 'N/A' }} g</p>
+                <p><strong>Status:</strong> {{ determineStatus(spool, index) }}</p>
+                <p><strong>Notes:</strong> {{ spool.notes }}</p>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script>
@@ -21,6 +29,7 @@ export default {
     return {
       spoolData: [],
       intervalId: null,
+      systemData: null,
     };
   },
   async mounted() {
@@ -39,6 +48,7 @@ export default {
         const data = await response.json();
         if (data.result && data.result.status === "success" && data.result.spools) {
           this.spoolData = this.extractLaneData(data.result.spools);
+          this.systemData = data.result.spools.system;
         }
       } catch (error) {
         console.error("Error fetching AFC spool data:", error);
@@ -55,45 +65,55 @@ export default {
       }
       return lanes;
     },
+    determineStatus(spool) {
+      if (spool.load && spool.prep && spool.loaded_to_hub) {
+        if (this.systemData && this.systemData.current_load === `leg${spool.LANE}`) {
+          return "Locked and loaded to tool";
+        }
+        return "Locked and Loaded";
+      }
+      return "Not Loaded";
+    },
   },
 };
 </script>
 
 <style scoped>
 .afc-panel {
-  font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
-  color: #333;
-  line-height: 1.6;
-  margin: 0;
-  padding: 20px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  margin-bottom: 16px;
 }
 
-h1 {
+.afc-panel-wrapper {
+  margin-bottom: 24px;
+}
+
+.v-card-title {
+  font-weight: bold;
+  font-size: 1.5em;
   text-align: center;
-  margin-bottom: 20px;
+  padding-bottom: 16px;
 }
 
-#spools-container {
+.spool-container {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 16px;
+  padding: 16px;
 }
 
-.spool {
-  flex: 1;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.spool-card {
+  background-color: #2e2e2e;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 300px;
+  width: 100%;
 }
 
-.spool h4 {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.spool p {
-  margin: 5px 0;
-  color: #666;
+.spool-card p {
+  margin: 8px 0;
 }
 </style>
