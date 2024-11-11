@@ -65,9 +65,13 @@ fi
 
 # Modify moonraker.cfg to add afc_plugin configuration
 if [ -e "$MOONRAKER_CFG" ]; then
-    echo "Modifying moonraker.cfg to add afc_plugin configuration..."
-    sed -i '/\[update_manager\]/a\[afc_plugin]\nspoolman_port: 7912\nspoolman_ip: localhost' "$MOONRAKER_CFG"
-    echo "moonraker.cfg modified."
+    if ! grep -q "\[afc_plugin\]" "$MOONRAKER_CFG"; then
+        echo "Modifying moonraker.cfg to add afc_plugin configuration..."
+        sed -i '/\[update_manager\]/a\[afc_plugin]\nspoolman_port: 7912\nspoolman_ip: localhost' "$MOONRAKER_CFG"
+        echo "moonraker.cfg modified."
+    else
+        echo "afc_plugin configuration already exists. Skipping modification."
+    fi
 else
     echo "Error: $MOONRAKER_CFG not found. Aborting."
     exit 1
