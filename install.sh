@@ -2,7 +2,7 @@
 
 # Define paths
 PLUGIN_SRC="moonraker/components/afc_plugin.py"
-PLUGIN_DST="$HOME/moonraker/components/afc_plugin.py"
+PLUGIN_DST="$HOME/moonraker/moonraker/components/afc_plugin.py"
 MAINSAIL_SRC="MainsailworkingCopy.zip"
 FLUIDD_SRC="FluiddworkingCopy.zip"
 MAINSAIL_DST="$HOME/mainsail"
@@ -11,7 +11,7 @@ MOONRAKER_CONF="$HOME/printer_data/config/moonraker.conf"
 
 # Symlink afc_plugin.py
 if [ -e "$PLUGIN_SRC" ]; then
-    if [ ! -d "$HOME/moonraker/components" ]; then
+    if [ ! -d "$HOME/moonraker/moonraker/components" ]; then
         echo "Error: Directory $HOME/moonraker/components does not exist. Aborting."
         exit 1
     fi
@@ -22,17 +22,7 @@ else
     echo "Error: $PLUGIN_SRC not found. Aborting."
     exit 1
 fi
-else
-    echo "Error: $PLUGIN_SRC not found. Aborting."
-    exit 1
-fi
 
-# Restart Moonraker service
-if sudo systemctl restart moonraker; then
-    echo "Moonraker restarted successfully."
-else
-    echo "Error restarting Moonraker. Aborting."
-    exit 1
 fi
 
 # User selection for Mainsail or Fluidd
@@ -71,16 +61,19 @@ else
     exit 1
 fi
 
-else
-    echo "Error: $PLUGIN_DST not found. Aborting."
-    exit 1
-fi
 
 # Install httpx using pip
 echo "Installing httpx using pip..."
 ~/moonraker-env/bin/pip install httpx
 if [ $? -eq 0 ]; then
     echo "httpx installed successfully."
+    echo "Restarting Moonraker service..."
+    if sudo systemctl restart moonraker; then
+        echo "Moonraker restarted successfully."
+    else
+        echo "Error restarting Moonraker. Aborting."
+        exit 1
+    fi
 else
     echo "Error installing httpx. Aborting."
     exit 1

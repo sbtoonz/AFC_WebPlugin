@@ -32,6 +32,10 @@ import { Component, Mixins } from 'vue-property-decorator'
 import BaseMixin from '@/components/mixins/base'
 import Panel from '@/components/ui/Panel.vue'
 import { mdiAdjust, mdiRefresh } from '@mdi/js'
+export default class AfcPanel extends Mixins(BaseMixin){
+  mdiAdjust = mdiAdjust
+  mdiRefresh = mdiRefresh
+}
 </script>
 <script>
 
