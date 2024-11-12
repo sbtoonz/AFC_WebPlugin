@@ -14,6 +14,9 @@ The AFC Plugin integrates the Armored Filament Carousel (AFC) with Moonraker and
 1. **Run the Installer Script**
    - Make the `install.sh` script executable and run it to install the plugin:
      ```sh
+     cd ~
+     git clone https://github.com/sbtoonz/AFC_WebPlugin.git
+     cd AFC_WebPlugin
      chmod +x install.sh
      ./install.sh
      ```
