@@ -3,7 +3,7 @@
     <panel :icon="mdiAdjust" :title="'AFC Spools'" card-class="afc-panel" :collapsible="true" :expanded="true">
       <template #buttons>
         <v-btn icon tile :title="'Refresh AFC Spools'" @click="fetchSpoolData">
-          <v-icon>{{ mdiRefresh }}</v-icon>
+          <v-icon>mdi-refresh</v-icon>
         </v-btn>
       </template>
       <div class="spool-container">
@@ -27,21 +27,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
-import Panel from '@/components/ui/Panel.vue'
-import { mdiAdjust, mdiRefresh } from '@mdi/js'
-export default class AfcPanel extends Mixins(BaseMixin){
-  mdiAdjust = mdiAdjust
-  mdiRefresh = mdiRefresh
-}
-</script>
 <script>
-
 export default {
   name: 'AfcPanel',
-    data() {
+  data() {
     return {
       spoolData: [],
       intervalId: null,
