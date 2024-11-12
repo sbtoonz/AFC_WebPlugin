@@ -61,7 +61,7 @@ class AFCPlugin:
 
                 if spools_response.status_code == 200:
                     spools_data = spools_response.json()
-                    logger.info(f"Successfully retrieved spools data from Spoolman: {spools_data}")
+                    #logger.info(f"Successfully retrieved spools data from Spoolman: {spools_data}")
 
                     # Create a dictionary by ID for easier lookup
                     spools_by_id = {str(spool["id"]): spool for spool in spools_data}
@@ -95,7 +95,7 @@ class AFCPlugin:
                         remaining_weight = spoolman_data.get("remaining_weight")
                         notes = spoolman_data.get("notes")
 
-                        logger.info(f"Material: {material}, Color: {color}, Remaining Weight: {remaining_weight}, Notes: {notes}")
+                        # logger.info(f"Material: {material}, Color: {color}, Remaining Weight: {remaining_weight}, Notes: {notes}")
 
                         enriched_spool_info.update({
                             "material": material,
