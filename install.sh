@@ -63,20 +63,6 @@ else
     exit 1
 fi
 
-# Modify moonraker.cfg to add afc_plugin configuration
-if [ -e "$HOME/printer_data/config/moonraker.conf" ]; then
-    if ! grep -q "\[afc_plugin\]" "$HOME/printer_data/config/moonraker.conf"; then
-        echo "Modifying moonraker.cfg to add afc_plugin configuration..."
-        sed -i '/\[update_manager\]/a\[afc_plugin]\nspoolman_port: 7912\nspoolman_ip: localhost' "$HOME/printer_data/config/moonraker.conf"
-        echo "moonraker.cfg modified."
-    else
-        echo "afc_plugin configuration already exists. Skipping modification."
-    fi
-else
-    echo "Error: $HOME/printer_data/config/moonraker.conf not found. Aborting."
-    exit 1
-fi
-
 # Create a symbolic link for afc_plugin.py to Moonraker directory
 if [ -e "$PLUGIN_DST" ]; then
     echo "Creating symbolic link for afc_plugin.py in Moonraker directory..."
