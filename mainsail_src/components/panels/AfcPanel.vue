@@ -1,9 +1,9 @@
 <template>
   <div class="afc-panel-wrapper">
-    <panel :title="'AFC Spools'" card-class="afc-panel" :collapsible="true" :expanded="true">
+    <panel :icon="mdiAdjust" :title="'AFC Spools'" card-class="afc-panel" :collapsible="true" :expanded="true">
       <template #buttons>
         <v-btn icon tile :title="'Refresh AFC Spools'" @click="fetchSpoolData">
-          <v-icon>mdi-refresh</v-icon>
+          <v-icon>{{ mdiRefresh }}</v-icon>
         </v-btn>
       </template>
       <div class="spool-container">
@@ -27,67 +27,84 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import { VBtn, VIcon } from 'vuetify/lib';
+import Panel from '@/components/ui/Panel.vue';
+import { mdiAdjust, mdiRefresh } from '@mdi/js';
 
-export default {
-  name: 'AfcPanel',
+interface Spool {
+  LANE: string;
+  load?: boolean;
+  prep?: boolean;
+}
+
+interface Spools {
+  [key: string]: Record<string, Spool>;
+  system?: any;
+}
+
+@Component({
   components: {
-    panel: () => import('@/components/Panel.vue'),
-    'v-btn': () => import('vuetify/lib/components/VBtn'),
-    'v-icon': () => import('vuetify/lib/components/VIcon'),
+    Panel,
+    VBtn,
+    VIcon,
   },
-  data() {
-    return {
-      spoolData: [],
-      intervalId: null,
-      systemData: null,
-      isPanelOpen: [0]
-    };
-  },
+})
+export default class AfcPanel extends Vue {
+  mdiAdjust = mdiAdjust
+  mdiRefresh = mdiRefresh
+  private spoolData: Spool[] = [];
+  private intervalId: number | null = null;
+  private systemData: any = null;
+  private isPanelOpen: number[] = [0];
+
   async mounted() {
     await this.fetchSpoolData();
-    this.intervalId = setInterval(this.fetchSpoolData, 10000); // Refresh data every 10 seconds
-  },
+    this.intervalId = window.setInterval(this.fetchSpoolData, 10000); // Refresh data every 10 seconds
+  }
+
   beforeDestroy() {
-    if (this.intervalId) {
+    if (this.intervalId !== null) {
       clearInterval(this.intervalId);
     }
-  },
-  methods: {
-    async fetchSpoolData() {
-      try {
-        const response = await fetch("/server/afc/spools");
-        const data = await response.json();
-        if (data.result && data.result.status === "success" && data.result.spools) {
-          this.spoolData = this.extractLaneData(data.result.spools);
-          this.systemData = data.result.spools.system;
-        }
-      } catch (error) {
-        console.error("Error fetching AFC spool data:", error);
+  }
+
+  private async fetchSpoolData() {
+    try {
+      const response = await fetch('/server/afc/spools');
+      const data = await response.json();
+      if (data.result && data.result.status === 'success' && data.result.spools) {
+        this.spoolData = this.extractLaneData(data.result.spools);
+        this.systemData = data.result.spools.system;
       }
-    },
-    extractLaneData(spools) {
-      const lanes = [];
-      for (let [unit, spool] of Object.entries(spools)) {
-        if (unit !== "system") {
-          for (let lane in spool) {
-            lanes.push(spool[lane]);
-          }
+    } catch (error) {
+      console.error('Error fetching AFC spool data:', error);
+    }
+  }
+
+  private extractLaneData(spools: Spools): Spool[] {
+    const lanes: Spool[] = [];
+    for (const [unit, spool] of Object.entries(spools)) {
+      if (unit !== 'system') {
+        for (const lane in spool) {
+          lanes.push(spool[lane]);
         }
       }
-      return lanes;
-    },
-    determineStatus(spool) {
-      if (spool.load && spool.prep) {
-        if (this.systemData && this.systemData.current_load === `leg${spool.LANE}`) {
-          return "Locked and loaded to tool";
-        }
-        return "Locked and Loaded";
+    }
+    return lanes;
+  }
+
+  private determineStatus(spool: Spool): string {
+    if (spool.load && spool.prep) {
+      if (this.systemData && this.systemData.current_load === `leg${spool.LANE}`) {
+        return 'Locked and loaded to tool';
       }
-      return "Not Loaded";
-    },
-  },
-};
+      return 'Locked and Loaded';
+    }
+    return 'Not Loaded';
+  }
+}
 </script>
 
 <style scoped>
@@ -136,10 +153,3 @@ export default {
   margin: 8px 0;
 }
 </style>
-<template #icon>
-  <div class="title-icon">
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 128 128">
-      <image x="6" width="116" height="128" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHQAAACACAYAAADamU0oAAAgAElEQVR4nO19CXhV1bX/WnvvM9xMqDhVhdja91qhk/b1tf2/VkSZaluZzFXAiWpRSHBonQIkN4eEgLPI5GxVIJhbAjigMkpfX9/rv1X7rw9q37N9ErAOFYdM90x77/+397k3uYkgSQiQ5GV9nx/x3nPOPWevvddvrd9aZy/oh4LbtydY5rFeWjXzm1tqSn6zZXXJjhefKvl65vPtibZj+pNgf3qY2toiGo8nufq77slrTzzGZLcC4LWAkKMeVEpoAoClH3uf3DXpiif3SQmYTBaRzDn9QfqFQhOJBBk+fBcqxSilHsdPvJYgmRuzjc990pgSjFEipYQwFPKYghim3GAvl6Jy9JRlDys9q3N27hwmHccRveBxDkn6tELVCnu5IkFHOk6o/n/z08VjGdBKy6TfamrxQXDBBw2K0YbG1F5AJAW59ikNTW5ICLKcmAmuF/w7CJh3/tSl2yBths+tcDgiyKP+cN2UPqtQWVtEMW0qNz0x80xqUYdRUiSEBM8P/dwcywyC0AfEZS1hWEk8xmI5UC4RrmWUsJaU79uWYarzhZCrmrnv/Hjag/8NHUx3X5M+p1A12EVFSaFW0fbHrz+G2/wWRLzeMmhOU4sXmAYzGCPKvD7jB7J83GVL/1/2+dtWXfdNoLLSMOgP/CCEIOBBXq5leH7YCFLe09iSunvCVY81SikRoAIR+5YZ7jMKzcZJ9f+bVhVPpxTLY7ZxekOjKxCR5OdZ4LrBHzmI8tGXLN8AaTP6MoBWSsXwXZhZ1VtqZl9ECDi2ZQxraHQloJQFeTHiesGbQkLFqEuWrILWCVSrrt8nzHCvV6gEwJcTbTi5afXMEYywSsti329J+cCFDPNzLeZ5wQcAuPD192DZ9dcv8aRMEKgAwOG7EDLms7aIyqJhUn/uOKK29sbYYBFcj4C3WBY7tqnJCygjhm0x8H2+LQjCsrGXrfgNpCfGSMfh0S31XunVCs3GsucenfmFnDxajoBXIEG1Ev2cmGkGIRcE4SGRCqvOv/KBt1vP2zksGnjHEafdXRSzWaN48/oXPUgkiD4ma7U/v7K4MEaxHBB/QimBlOv7Mds0Q87VNR5t9vzKC694qL7jPfVG6ZUKlYkEqdC6cMRLT16ay9ixNyLKmyzLGNTU7AWMEcOyGASB2OyLsGzslOW/hSzz6mStyqELJ08GkNUoIRQgS/fMWfeM/pHECJaAc8W5AKTVS14963uE0ErbZOem3ABCLsL8PIu5XvChBLidphrvHzn9CVemJwX2wjCnVylUOSLJZLw10N9SU3JxhHPmlxoaU3rFFeTH0PXCPwvJK0ZdsmwNpFeNjiPhZQLODq2coVUTz0ZKKpGRCyQX+lHVyhaCb+Acy9+eu/aP+kfTis3G582rSi6nDMtti53Rhs82uK6/EwDLz7tkSR2kPW1IO2hHcdjaSW9RKG7Pwsmtq0r+GSlUmiYb43mh8lgznugnEuCufR/w++Ily5uUo1Sh8DDZtiILExecDFbOHIlyJmGUCdfnSpeZHyK2SUTIPRSw1Pe8Re84z32gvygqorVF6p/IAdq4cnaBzeRNgHijadA8ZRkMgxmmQZVn/LwXiPIfXLbsVWjD1/CojV6WHHWFZmPSs7+49tRc25grQV5jMEp0rGgbphRSkQhPch46o6et+Ctk4+SuXQjJJFcrbag9eCYAzCGmcbJI+WrJc0Ck7X4w/RmJmSD94G0BWLXHXfsQOCCU0wQ7h8lsfN2ypvgfCZIKgjhFLUPPi7BbTTKQsKJRtlSPn/roex2f5WjJU" />
-    </svg>
-  </div>
-</template>
