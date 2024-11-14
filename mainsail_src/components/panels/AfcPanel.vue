@@ -72,23 +72,29 @@ export default class AfcPanel extends Vue {
 
   private async fetchSpoolData() {
     try {
-      const response = await fetch('/server/afc/spools');
+      const response = await fetch("/server/afc/spools");
       const data = await response.json();
-      if (data.result && data.result.status === 'success' && data.result.spools) {
+      if (data.result && data.result.status === "success" && data.result.spools) {
         this.spoolData = this.extractLaneData(data.result.spools);
         this.systemData = data.result.spools.system;
       }
     } catch (error) {
-      console.error('Error fetching AFC spool data:', error);
+      console.error("Error fetching AFC spool data:", error);
     }
   }
 
-  private extractLaneData(spools: Spools): Spool[] {
-    const lanes: Spool[] = [];
-    for (const [unit, spool] of Object.entries(spools)) {
-      if (unit !== 'system') {
-        for (const lane in spool) {
-          lanes.push(spool[lane]);
+  private extractLaneData(spools: any) {
+    const lanes = [];
+    const numUnits = spools.system.num_units;
+    const numLanes = spools.system.num_lanes;
+    for (let i = 1; i <= numUnits; i++) {
+      const unitName = `Turtle_${i}`;
+      if (spools[unitName]) {
+        for (let j = 1; j <= numLanes; j++) {
+          const laneName = `leg${j}`;
+          if (spools[unitName][laneName]) {
+            lanes.push(spools[unitName][laneName]);
+          }
         }
       }
     }
