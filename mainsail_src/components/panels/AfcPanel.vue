@@ -6,8 +6,17 @@
           <v-icon>{{ mdiRefresh }}</v-icon>
         </v-btn>
       </template>
+      <div v-if="totalPages > 1" class="pagination-controls">
+        <v-btn icon @click="prevPage" :disabled="currentPage === 0">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+        <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+        <v-btn icon @click="nextPage" :disabled="currentPage >= totalPages - 1">
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+      </div>
       <div class="spool-container">
-        <div v-for="(spool, index) in spoolData" :key="index" class="spool-card">
+        <div v-for="(spool, index) in paginatedSpoolData" :key="index" class="spool-card">
           <div class="filament-reel" style="padding: 1rem;">
             <svg width="50" height="50" viewBox="0 0 487.04 487.04">
               <g>
@@ -17,7 +26,7 @@
               </g>
             </svg>
           </div>
-          <h3>Spool {{ index + 1 }}</h3>
+          <h3>Spool {{ index + 1 + currentPage * spoolsPerPage }}</h3>
           <p><strong>Material:</strong> {{ spool.material }}</p>
           <p><strong>Remaining Weight:</strong> {{ spool.remaining_weight ? spool.remaining_weight.toFixed(2) : 'N/A' }} g</p>
           <p><strong>Status:</strong> {{ determineStatus(spool, index) }}</p>
@@ -28,44 +37,33 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { VBtn, VIcon } from 'vuetify/lib';
-import Panel from '@/components/ui/Panel.vue';
-import { mdiAdjust, mdiRefresh } from '@mdi/js';
-
-interface Spool {
-  LANE: string;
-  load?: boolean;
-  prep?: boolean;
-}
-
-interface Spools {
-  [key: string]: Record<string, Spool>;
-  system?: any;
-}
-
+import { Component, Mixins } from 'vue-property-decorator'
+import BaseMixin from '@/components/mixins/base'
+import Panel from '@/components/ui/Panel.vue'
+import { mdiAdjust, mdiRefresh } from '@mdi/js'
 @Component({
   components: {
-    Panel,
-    VBtn,
-    VIcon,
-  },
+    Panel
+  }
 })
-export default class AfcPanel extends Vue {
+export default class AfcPanel extends Mixins(BaseMixin) {
   mdiAdjust = mdiAdjust
   mdiRefresh = mdiRefresh
-  private spoolData: Spool[] = [];
-  private intervalId: number | null = null;
-  private systemData: any = null;
-  private isPanelOpen: number[] = [0];
+
+  spoolData: any[] = []
+  intervalId: number | null = null
+  systemData: any = null
+  isPanelOpen: number[] = [0]
+  currentPage: number = 0
+  spoolsPerPage: number = 4
 
   async mounted() {
     await this.fetchSpoolData();
-    this.intervalId = window.setInterval(this.fetchSpoolData, 10000); // Refresh data every 10 seconds
+    this.intervalId = setInterval(this.fetchSpoolData, 10000); // Refresh data every 10 seconds
   }
 
   beforeDestroy() {
-    if (this.intervalId !== null) {
+    if (this.intervalId) {
       clearInterval(this.intervalId);
     }
   }
@@ -101,14 +99,36 @@ export default class AfcPanel extends Vue {
     return lanes;
   }
 
-  private determineStatus(spool: Spool): string {
-    if (spool.load && spool.prep) {
-      if (this.systemData && this.systemData.current_load === `leg${spool.LANE}`) {
-        return 'Locked and loaded to tool';
-      }
-      return 'Locked and Loaded';
+  private get totalPages() {
+    return Math.ceil(this.spoolData.length / this.spoolsPerPage);
+  }
+
+  private get paginatedSpoolData() {
+    const start = this.currentPage * this.spoolsPerPage;
+    const end = start + this.spoolsPerPage;
+    return this.spoolData.slice(start, end);
+  }
+
+  private prevPage() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
     }
-    return 'Not Loaded';
+  }
+
+  private nextPage() {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+    }
+  }
+
+  private determineStatus(spool: any) {
+    if (spool.load && spool.prep && spool.loaded_to_hub) {
+      if (this.systemData && this.systemData.current_load === `leg${spool.LANE}`) {
+        return "Locked and loaded to tool";
+      }
+      return "Locked and Loaded";
+    }
+    return "Not Loaded";
   }
 }
 </script>
@@ -157,5 +177,16 @@ export default class AfcPanel extends Vue {
 
 .spool-card p {
   margin: 8px 0;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.pagination-controls span {
+  margin: 0 16px;
 }
 </style>
