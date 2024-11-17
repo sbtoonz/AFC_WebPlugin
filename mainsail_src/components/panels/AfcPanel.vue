@@ -114,22 +114,39 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     }
 
     private extractLaneData(spools: any) {
-        const lanes = []
-        const numUnits = spools.system.num_units
-        const numLanes = spools.system.num_lanes
-        for (let i = 1; i <= numUnits; i++) {
-            const unitName = `Turtle_${i}`
-            if (spools[unitName]) {
-                for (let j = 1; j <= numLanes; j++) {
-                    const laneName = `leg${j}`
-                    if (spools[unitName][laneName]) {
-                        lanes.push(spools[unitName][laneName])
-                    }
-                }
-            }
+    const lanes: any[] = [];
+
+    Object.keys(spools).forEach((unitName) => {
+        if (unitName === 'system') {
+            return;
         }
-        return lanes
-    }
+
+        const unitData = spools[unitName];
+        
+        Object.keys(unitData).forEach((laneKey) => {
+            if (laneKey === 'system') {
+                return;
+            }
+
+            const lane = unitData[laneKey];
+
+             lanes.push({
+                unit: unitName,
+                laneNumber: lane.LANE,
+                command: lane.Command,
+                load: lane.load,
+                prep: lane.prep,
+                loadedToHub: lane.loaded_to_hub,
+                material: lane.material,
+                spoolId: lane.spool_id,
+                color: lane.color,
+            });
+        });
+    });
+
+    return lanes;
+}
+
 
     private get totalPages() {
         return Math.ceil(this.spoolData.length / this.spoolsPerPage)
