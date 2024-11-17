@@ -152,32 +152,24 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     Object.keys(spools).forEach((unitName) => {
       const unitData = spools[unitName];
 
-      if (unitName === "system") {
-        // Store system data separately
-        this.systemData = unitData;
-        return;
-      }
-
       Object.keys(unitData).forEach((laneKey) => {
-        if (laneKey === "system") {
-          // Skip system information inside each unit
-          return;
-        }
-
         const lane = unitData[laneKey];
 
-        // Normalize data extraction to accommodate different naming schemes
-        lanes.push({
-          unit: unitName,
-          laneNumber: lane.LANE,
-          command: lane.Command,
-          load: lane.load,
-          prep: lane.prep,
-          loadedToHub: lane.loaded_to_hub,
-          material: lane.material,
-          spoolId: lane.spool_id,
-          color: lane.color,
-        });
+        // Check if lane is an object before accessing its properties
+        if (typeof lane === "object" && lane !== null) {
+          // Normalize data extraction to accommodate different naming schemes
+          lanes.push({
+            unit: unitName,
+            laneNumber: lane.LANE,
+            command: lane.Command,
+            load: lane.load,
+            prep: lane.prep,
+            loadedToHub: lane.loaded_to_hub,
+            material: lane.material,
+            spoolId: lane.spool_id,
+            color: lane.color,
+          });
+        }
       });
     });
 
