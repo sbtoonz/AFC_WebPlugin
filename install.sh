@@ -23,8 +23,6 @@ else
     exit 1
 fi
 
-fi
-
 # User selection for Mainsail or Fluidd
 read -p "Do you want to install Mainsail or Fluidd? (m/f): " USER_CHOICE
 
