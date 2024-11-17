@@ -171,7 +171,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     }
 
     private determineStatus(spool: any) {
-        if (spool.load && spool.prep && spool.loaded_to_hub) {
+        if (spool.load && spool.prep) {
             if (this.systemData && this.systemData.current_load === `leg${spool.LANE}`) {
                 return 'Locked and loaded to tool'
             }
