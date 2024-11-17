@@ -61,7 +61,6 @@ class AFCPlugin:
 
                 if spools_response.status_code == 200:
                     spools_data = spools_response.json()
-                    #logger.info(f"Successfully retrieved spools data from Spoolman: {spools_data}")
 
                     # Create a dictionary by ID for easier lookup
                     spools_by_id = {str(spool["id"]): spool for spool in spools_data}
@@ -86,16 +85,13 @@ class AFCPlugin:
 
                     if spool_id and spool_id in spools_by_id:
                         spoolman_data = spools_by_id[spool_id]
-                        logger.info(f"Enriching spool {spool_id} with data: {spoolman_data}")
 
                         # Access the nested filament object
                         filament_data = spoolman_data.get("filament", {})
                         material = filament_data.get("material")
                         color = filament_data.get("color_hex")
                         remaining_weight = spoolman_data.get("remaining_weight")
-                        notes = spoolman_data.get("notes")
-
-                        # logger.info(f"Material: {material}, Color: {color}, Remaining Weight: {remaining_weight}, Notes: {notes}")
+                        notes = filament_data.get("notes")  # Moved this to filament_data as originally intended
 
                         enriched_spool_info.update({
                             "material": material,
