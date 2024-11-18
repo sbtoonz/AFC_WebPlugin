@@ -106,6 +106,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   currentPage: number = 0;
   spoolsPerPage: number = 4;
   index: number = 0;
+  private lastValidData: any = null;
 
   async mounted() {
     await this.fetchSpoolData();
@@ -128,16 +129,25 @@ export default class AfcPanel extends Mixins(BaseMixin) {
         },
       });
 
-      if (response.status === 200 || response.status === 304) {
+      // Handle 200 or 304 response statuses
+      if (response.status === 200) {
         const data = await response.json();
         if (
+          data &&
           data.result &&
           data.result.status === "success" &&
           data.result.spools
         ) {
-          this.spoolData = this.extractLaneData(data.result.spools);
-          this.systemData = data.result.spools.system;
+          this.lastValidData = data.result.spools;
+          this.systemData = this.lastValidData.system; // Ensure system data is always stored first
+          this.spoolData = this.extractLaneData(this.lastValidData);
+        } else {
+          console.warn("No valid data found in response for spool data.");
         }
+      } else if (response.status === 304 && this.lastValidData) {
+        // Use the last valid data if we get a 304 response
+        this.systemData = this.lastValidData.system;
+        this.spoolData = this.extractLaneData(this.lastValidData);
       } else {
         console.warn(`Unexpected response status: ${response.status}`);
       }
@@ -146,35 +156,34 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     }
   }
 
-  private extractLaneData(spools: any) {
-    const lanes: any[] = [];
+  extractLaneData(spools: any) {
+    const lanes = [];
+    const unitSystemData = {};
+    let globalSystemData = {};
 
-    Object.keys(spools).forEach((unitName) => {
-      const unitData = spools[unitName];
+    // Iterate over each unit in the spools data
+    for (const unitName in spools) {
+        if (unitName !== 'system') {
+            const unit = spools[unitName];
+            unitSystemData[unitName] = unit.system || {};
 
-      Object.keys(unitData).forEach((laneKey) => {
-        const lane = unitData[laneKey];
-
-        // Check if lane is an object before accessing its properties
-        if (typeof lane === "object" && lane !== null) {
-          // Normalize data extraction to accommodate different naming schemes
-          lanes.push({
-            unit: unitName,
-            laneNumber: lane.LANE,
-            command: lane.Command,
-            load: lane.load,
-            prep: lane.prep,
-            loadedToHub: lane.loaded_to_hub,
-            material: lane.material,
-            spoolId: lane.spool_id,
-            color: lane.color,
-          });
+            // Iterate over each lane/leg in the unit
+            for (const laneKey in unit) {
+                if (laneKey.startsWith('leg') || laneKey.startsWith('lane')) {
+                    lanes.push(unit[laneKey]);
+                }
+            }
+        } else {
+            // Extract global system data
+            globalSystemData = spools[unitName];
         }
-      });
-    });
+    }
 
+    // Store or return the extracted data as needed
+    this.unitSystemData = unitSystemData;
+    this.globalSystemData = globalSystemData;
     return lanes;
-  }
+}
 
   private get totalPages() {
     return Math.ceil(this.spoolData.length / this.spoolsPerPage);
