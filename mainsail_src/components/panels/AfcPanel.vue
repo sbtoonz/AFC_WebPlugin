@@ -169,7 +169,8 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
             // Iterate over each lane/leg in the unit
             for (const laneKey in unit) {
-                if (laneKey.startsWith('leg') || laneKey.startsWith('lane')) {
+                // Push each lane/leg data as long as the key is not 'system'
+                if (laneKey !== 'system' && typeof unit[laneKey] === 'object' && unit[laneKey] !== null) {
                     lanes.push(unit[laneKey]);
                 }
             }
