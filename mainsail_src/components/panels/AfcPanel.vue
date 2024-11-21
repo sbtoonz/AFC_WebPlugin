@@ -45,7 +45,7 @@
             @click="openChangeSpoolDialog(spool, index)"
           >
             <div class="filament-reel" style="padding: 1rem">
-              <spool-icon :color="spool.color" style="width: 50px; float:left" class="mr-3" />
+              <spool-icon :color="spool.color" style="width: 15%; float:left" class="mr-3" />
             </div>
             <h3>Spool {{ spool.LANE }}</h3>
             <p v-if="spool.material">
@@ -159,6 +159,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
             if (
               unit.hasOwnProperty(laneKey) &&
               typeof unit[laneKey] === "object"
+              && unit[laneKey] !== "system"
             ) {
               const laneData = unit[laneKey];
               laneData.unitName = unitName;
@@ -214,7 +215,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     if (spool.load && spool.prep) {
       if (
         this.systemData &&
-        this.systemData.current_load === `leg${spool.LANE}`
+        this.systemData.current_load === `{leg${spool.LANE}}`
       ) {
         return "In Tool";
       }
@@ -272,9 +273,9 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
 .spool-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 16px;
   padding: 8px;
 }
 
@@ -286,7 +287,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   max-width: 180px;
   width: 100%;
   position: relative;
-  cursor: pointer;
+  cursor: hand;
   transition: box-shadow 0.3s;
   margin-bottom: 12px;
 }
