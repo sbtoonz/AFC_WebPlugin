@@ -189,16 +189,6 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     return Math.ceil(this.spoolData.length / this.spoolsPerPage);
   }
 
-  private get unitNames() {
-    return [...new Set(this.spoolData.map((spool) => spool.unitName))];
-  }
-
-  private get paginatedSpoolData() {
-    const start = this.currentPage * this.spoolsPerPage;
-    const end = start + this.spoolsPerPage;
-    return this.spoolData.slice(start, end);
-  }
-
   private prevPage() {
     if (this.currentPage > 0) {
       this.currentPage--;
