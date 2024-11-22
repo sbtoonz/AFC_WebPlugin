@@ -11,7 +11,7 @@
         <v-btn icon tile :title="'Refresh AFC Spools'" @click="fetchSpoolData">
           <v-icon>{{ mdiRefresh }}</v-icon>
         </v-btn>
-        <v-menu :offset-y="true" :close-on-content-click="true" left>
+        <!--<v-menu :offset-y="true" :close-on-content-click="true" left>
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon tile v-bind="attrs" v-on="on">
               <v-icon>{{ mdiDotsVertical }}</v-icon>
@@ -27,8 +27,8 @@
                 label="Mainsail Theme"
                 @change="onIconStyleChange('mainsail')"
               ></v-checkbox>
-            </v-list-item>
-            <v-list-item>
+            </v-list-item>-->
+            <!--<v-list-item>
               <v-checkbox
                 v-model="klipperScreenIconSwitch"
                 label="KlipperScreen Theme"
@@ -41,8 +41,8 @@
                 label="Spoolman Theme"
                 @change="onIconStyleChange('spoolman')"
               ></v-checkbox>
-            </v-list-item>
-            <v-list-item>
+            </v-list-item>-->
+            <!--<v-list-item>
               <v-checkbox
                 v-model="noIconSwitch"
                 label="No Icon"
@@ -50,7 +50,7 @@
               ></v-checkbox>
             </v-list-item>
           </v-list>
-        </v-menu>
+        </v-menu>-->
       </template>
 
       <div
@@ -86,7 +86,11 @@
               <!-- 
                 v-if="klipperScreenIconSwitch"
                 populate using MG's CSS
-              -->
+              <div
+              v-if="klipperScreenIconSwitch"
+              :class="spool">
+              </div>-->
+
               <!-- 
                 v-if="spoolManIconSwitch"
                 populate using Spoolmans
@@ -273,11 +277,22 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     return this.systemData?.hub_loaded || false;
   }
 
-  private onIconStyleChange(selectedStyle: string){
-    this.mainsailIconSwitch = selectedStyle === 'mainsail';
-    this.klipperScreenIconSwitch = selectedStyle === 'klipperscreen';
-    this.spoolManIconSwitch = selectedStyle === 'spoolman';
-    this.noIconSwitch = selectedStyle === 'none';
+  private onIconStyleChange(selectedStyle: string) {
+    this.mainsailIconSwitch = false;
+    this.klipperScreenIconSwitch = false;
+    this.spoolManIconSwitch = false;
+    this.noIconSwitch = false;
+
+    // Set the selected one to true
+    if (selectedStyle === "mainsail") {
+      this.mainsailIconSwitch = true;
+    } else if (selectedStyle === "klipperscreen") {
+      this.klipperScreenIconSwitch = true;
+    } else if (selectedStyle === "spoolman") {
+      this.spoolManIconSwitch = true;
+    } else if (selectedStyle === "none") {
+      this.noIconSwitch = true;
+    }
   }
 }
 </script>
@@ -375,5 +390,23 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
 .status-in-tool {
   background-color: rgb(6, 197, 245);
+}
+
+.spool-ks {
+  flex: 1;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.spool-ks h4 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.spool-ks p {
+  margin: 5px 0;
+  color: #666;
 }
 </style>
