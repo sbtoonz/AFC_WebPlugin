@@ -307,7 +307,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   height: 10px;
   border-radius: 50%;
   display: inline-block;
-  margin-left: 8px;
+  margin-left: 5px;
 }
 
 .status-green {
