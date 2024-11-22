@@ -8,11 +8,38 @@
       :expanded="true"
     >
       <template #buttons>
+        <v-menu :offset-y="true" :close-on-content-click="true" left>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon tile v-bind="attrs" v-on="on">
+              <v-icon>{{ mdiDotsVertical }}</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-checkbox
+                v-model="useIconStyle1"
+                label="Mainsail Theme"
+              ></v-checkbox>
+            </v-list-item>
+            <v-list-item>
+              <v-checkbox
+                v-model="useIconStyle2"
+                label="KlipperScreen Theme"
+              ></v-checkbox>
+            </v-list-item>
+            <v-list-item>
+              <v-checkbox
+                v-model="useIconStyle3"
+                label="Spoolman Theme"
+              ></v-checkbox>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <v-btn icon tile :title="'Refresh AFC Spools'" @click="fetchSpoolData">
           <v-icon>{{ mdiRefresh }}</v-icon>
         </v-btn>
       </template>
-      
+
       <div
         v-for="(unit, unitName) in unitsData"
         :key="unitName"
@@ -37,7 +64,11 @@
             @click="openChangeSpoolDialog(spool, index)"
           >
             <div class="filament-reel" style="padding: 1rem">
-              <spool-icon :color="spool.color" style="width: 25%; float:right" class="mr-3" />
+              <spool-icon
+                :color="spool.color"
+                style="width: 25%; float: right"
+                class="mr-3"
+              />
             </div>
             <h3>Spool {{ spool.LANE }}</h3>
             <p v-if="spool.material">
@@ -78,7 +109,7 @@
 import { Component, Mixins } from "vue-property-decorator";
 import BaseMixin from "@/components/mixins/base";
 import Panel from "@/components/ui/Panel.vue";
-import { mdiAdjust, mdiRefresh } from "@mdi/js";
+import { mdiAdjust, mdiRefresh, mdiDotsVertical } from "@mdi/js";
 import AfcChangeSpoolDialog from "@/components/dialogs/AfcChangeSpoolDialog.vue";
 import SpoolIcon from "@/components/ui/SpoolIcon.vue";
 
@@ -86,12 +117,16 @@ import SpoolIcon from "@/components/ui/SpoolIcon.vue";
   components: {
     Panel,
     AfcChangeSpoolDialog,
-    SpoolIcon
+    SpoolIcon,
   },
 })
 export default class AfcPanel extends Mixins(BaseMixin) {
   mdiAdjust = mdiAdjust;
   mdiRefresh = mdiRefresh;
+  mdiDotsVertical = mdiDotsVertical;
+  useIconStyle1: boolean = false;
+  useIconStyle2: boolean = false;
+  useIconStyle3: boolean = true;
 
   showChangeSpoolDialog = false;
   selectedLane: any = null; // This will hold data of the clicked lane
@@ -125,8 +160,8 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
     if (afcData) {
       this.spoolData = this.extractLaneData(afcData);
-      this.unitsData = this.groupByUnit(this.spoolData); 
-      this.systemData = afcData.system || {}; 
+      this.unitsData = this.groupByUnit(this.spoolData);
+      this.systemData = afcData.system || {};
       for (const unitName in afcData) {
         if (afcData.hasOwnProperty(unitName) && unitName !== "system") {
           if (this.unitsData[unitName]) {
@@ -150,8 +185,8 @@ export default class AfcPanel extends Mixins(BaseMixin) {
           for (const laneKey in unit) {
             if (
               unit.hasOwnProperty(laneKey) &&
-              typeof unit[laneKey] === "object"
-              && unit[laneKey] !== "system"
+              typeof unit[laneKey] === "object" &&
+              unit[laneKey] !== "system"
             ) {
               const laneData = unit[laneKey];
               laneData.unitName = unitName;
@@ -195,10 +230,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
   private determineStatus(spool: any) {
     if (spool.load && spool.prep) {
-      if (
-        this.systemData &&
-        this.systemData.current_load === spool.laneName        
-      ) {
+      if (this.systemData && this.systemData.current_load === spool.laneName) {
         return "In Tool";
       }
       return "Ready";
@@ -281,17 +313,6 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
 .spool-card p {
   margin: 8px 0;
-}
-
-.pagination-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 16px 0;
-}
-
-.pagination-controls span {
-  margin: 0 16px;
 }
 
 .status-light {
