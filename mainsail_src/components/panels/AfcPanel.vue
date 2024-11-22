@@ -12,15 +12,7 @@
           <v-icon>{{ mdiRefresh }}</v-icon>
         </v-btn>
       </template>
-      <div v-if="totalPages > 1" class="pagination-controls">
-        <v-btn icon @click="prevPage" :disabled="currentPage === 0">
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-        <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-        <v-btn icon @click="nextPage" :disabled="currentPage >= totalPages - 1">
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
-      </div>
+      
       <div
         v-for="(unit, unitName) in unitsData"
         :key="unitName"
