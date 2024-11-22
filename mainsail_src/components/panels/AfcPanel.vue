@@ -22,28 +22,32 @@
               <v-list-item-title>Filament Icon Style</v-list-item-title>
             </v-list-item>
             <v-list-item>
-              <v-radio
+              <v-checkbox
                 v-model="mainsailIconSwitch"
                 label="Mainsail Theme"
-              ></v-radio>
+                @change="onIconStyleChange('mainsail')"
+              ></v-checkbox>
             </v-list-item>
             <v-list-item>
-              <v-radio
+              <v-checkbox
                 v-model="klipperScreenIconSwitch"
                 label="KlipperScreen Theme"
-              ></v-radio>
+                @change="onIconStyleChange('klipperscreen')"
+              ></v-checkbox>
             </v-list-item>
             <v-list-item>
-              <v-radio
+              <v-checkbox
                 v-model="spoolManIconSwitch"
                 label="Spoolman Theme"
-              ></v-radio>
+                @change="onIconStyleChange('spoolman')"
+              ></v-checkbox>
             </v-list-item>
             <v-list-item>
-              <v-radio
+              <v-checkbox
                 v-model="noIconSwitch"
                 label="No Icon"
-              ></v-radio>
+                @change="onIconStyleChange('none')"
+              ></v-checkbox>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -85,7 +89,7 @@
               -->
               <!-- 
                 v-if="spoolManIconSwitch"
-                populate using Spoolmans CSS
+                populate using Spoolmans
               -->
             </div>
             <h3>Spool {{ spool.LANE }}</h3>
@@ -267,6 +271,13 @@ export default class AfcPanel extends Mixins(BaseMixin) {
       return this.unitsData[unitName].system.hub_loaded;
     }
     return this.systemData?.hub_loaded || false;
+  }
+
+  private onIconStyleChange(selectedStyle: string){
+    this.mainsailIconSwitch = selectedStyle === 'mainsail';
+    this.klipperScreenIconSwitch = selectedStyle === 'klipperscreen';
+    this.spoolManIconSwitch = selectedStyle === 'spoolman';
+    this.noIconSwitch = selectedStyle === 'none';
   }
 }
 </script>
