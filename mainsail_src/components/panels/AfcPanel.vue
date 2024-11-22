@@ -37,7 +37,7 @@
             }"
           ></span>
         </div>
-        <div class="spool-container" style="margin-top: 24px">
+        <div class="spool-container" style="margin-top: 15px">
           <div
             v-for="(spool, index) in unit.spools"
             :key="index"
@@ -45,7 +45,7 @@
             @click="openChangeSpoolDialog(spool, index)"
           >
             <div class="filament-reel" style="padding: 1rem">
-              <spool-icon :color="spool.color" style="width: 15%; float:left" class="mr-3" />
+              <spool-icon :color="spool.color" style="width: 25%; float:right" class="mr-3" />
             </div>
             <h3>Spool {{ spool.LANE }}</h3>
             <p v-if="spool.material">
@@ -205,7 +205,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     if (spool.load && spool.prep) {
       if (
         this.systemData &&
-        this.systemData.current_load === `{leg${spool.LANE}}`
+        this.systemData.current_load === spool.laneName        
       ) {
         return "In Tool";
       }
@@ -215,12 +215,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   }
 
   openChangeSpoolDialog(spool: any, index: number) {
-    this.selectedLane = { spool, laneNumber: index + 1 };
-    console.log(
-      "this index and index",
-      this.index,
-      this.selectedLane.laneNumber
-    );
+    this.selectedLane = { spool, laneName: spool.laneName };
     this.showChangeSpoolDialog = true;
   }
 
@@ -288,8 +283,8 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
 .filament-reel {
   position: absolute;
-  top: -30px;
-  right: -20px;
+  top: -10px;
+  right: -15px;
 }
 
 .spool-card p {

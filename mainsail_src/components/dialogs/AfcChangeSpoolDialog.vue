@@ -163,7 +163,7 @@ export default class AfcChangeSpoolDialog extends Mixins(BaseMixin) {
 
     ejectSpool() {
         if (this.laneData != null) {
-            const gcode = `SET_SPOOL_ID LANE=leg${this.laneData.laneNumber} SPOOL_ID=`
+            const gcode = `SET_SPOOL_ID LANE=${this.laneData.laneName} SPOOL_ID=`
             console.log('Dispatching G-code:', gcode)
 
             this.$nextTick(async () => {
@@ -212,7 +212,7 @@ export default class AfcChangeSpoolDialog extends Mixins(BaseMixin) {
     setSpool(spool: any) {
         console.log('Spool set as:', spool)
         console.log('Lane data received:', this.laneData)
-        const gcode = `SET_SPOOL_ID LANE=leg${this.laneData.laneNumber} SPOOL_ID=${spool.id}`
+        const gcode = `SET_SPOOL_ID LANE=${this.laneData.laneName} SPOOL_ID=${spool.id}`
         console.log('Dispatching G-code:', gcode)
 
         this.$nextTick(async () => {
