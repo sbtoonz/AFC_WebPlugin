@@ -8,6 +8,9 @@
       :expanded="true"
     >
       <template #buttons>
+        <v-btn icon tile :title="'Refresh AFC Spools'" @click="fetchSpoolData">
+          <v-icon>{{ mdiRefresh }}</v-icon>
+        </v-btn>
         <v-menu :offset-y="true" :close-on-content-click="true" left>
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon tile v-bind="attrs" v-on="on">
@@ -16,28 +19,34 @@
           </template>
           <v-list>
             <v-list-item>
-              <v-checkbox
-                v-model="useIconStyle1"
+              <v-list-item-title>Filament Icon Style</v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-radio
+                v-model="mainsailIconSwitch"
                 label="Mainsail Theme"
-              ></v-checkbox>
+              ></v-radio>
             </v-list-item>
             <v-list-item>
-              <v-checkbox
-                v-model="useIconStyle2"
+              <v-radio
+                v-model="klipperScreenIconSwitch"
                 label="KlipperScreen Theme"
-              ></v-checkbox>
+              ></v-radio>
             </v-list-item>
             <v-list-item>
-              <v-checkbox
-                v-model="useIconStyle3"
+              <v-radio
+                v-model="spoolManIconSwitch"
                 label="Spoolman Theme"
-              ></v-checkbox>
+              ></v-radio>
+            </v-list-item>
+            <v-list-item>
+              <v-radio
+                v-model="noIconSwitch"
+                label="No Icon"
+              ></v-radio>
             </v-list-item>
           </v-list>
         </v-menu>
-        <v-btn icon tile :title="'Refresh AFC Spools'" @click="fetchSpoolData">
-          <v-icon>{{ mdiRefresh }}</v-icon>
-        </v-btn>
       </template>
 
       <div
@@ -65,10 +74,19 @@
           >
             <div class="filament-reel" style="padding: 1rem">
               <spool-icon
+                v-if="mainsailIconSwitch"
                 :color="spool.color"
                 style="width: 25%; float: right"
                 class="mr-3"
               />
+              <!-- 
+                v-if="klipperScreenIconSwitch"
+                populate using MG's CSS
+              -->
+              <!-- 
+                v-if="spoolManIconSwitch"
+                populate using Spoolmans CSS
+              -->
             </div>
             <h3>Spool {{ spool.LANE }}</h3>
             <p v-if="spool.material">
@@ -124,9 +142,10 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   mdiAdjust = mdiAdjust;
   mdiRefresh = mdiRefresh;
   mdiDotsVertical = mdiDotsVertical;
-  useIconStyle1: boolean = false;
-  useIconStyle2: boolean = false;
-  useIconStyle3: boolean = true;
+  mainsailIconSwitch: boolean = true;
+  klipperScreenIconSwitch: boolean = false;
+  spoolManIconSwitch: boolean = false;
+  noIconSwitch: boolean = false;
 
   showChangeSpoolDialog = false;
   selectedLane: any = null; // This will hold data of the clicked lane
