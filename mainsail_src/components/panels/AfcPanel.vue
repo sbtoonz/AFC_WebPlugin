@@ -268,6 +268,16 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     return weight ? `${weight} g` : '';
   }
 
+  private determineStatus(spool: any) {
+    if (spool.load && spool.prep) {
+      if (this.systemData && this.systemData.current_load === spool.laneName) {
+        return "In Tool";
+      }
+      return "Ready";
+    }
+    return "Not Ready";
+  }
+
   private onIconStyleChange(selectedStyle: string) {
     this.mainsailIconSwitch = false;
     this.klipperScreenIconSwitch = false;
