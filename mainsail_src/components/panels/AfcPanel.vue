@@ -12,6 +12,7 @@
           <v-icon>{{ mdiRefresh }}</v-icon>
         </v-btn>
       </template>
+
       <div
         v-for="(unit, unitName) in unitsData"
         :key="unitName"
@@ -53,23 +54,23 @@
                 class="mr-3"
               />
             </div>
-            <h3>{{ spool.laneName }}</h3>
+            <h3>Spool: {{ spool.LANE }}</h3>
             <p v-if="spool.material">
-              {{ spool.material }}
+              Material: {{ spool.material }}
             </p>
             <p v-if="spoolWeight(spool)">
-              {{ spoolWeight(spool) }}
+              Weight: {{ spoolWeight(spool) }}
             </p>
             <p>
+              {{ determineStatus(spool) }}
               <span
                 :class="{
-                  'status-text-not-ready':
-                    determineStatus(spool) === 'Not Ready',
-                  'status-text-ready': determineStatus(spool) === 'Ready',
-                  'status-text-in-tool': determineStatus(spool) === 'In Tool',
+                  'status-light': true,
+                  'status-not-ready': determineStatus(spool) === 'Not Ready',
+                  'status-ready': determineStatus(spool) === 'Ready',
+                  'status-in-tool': determineStatus(spool) === 'In Tool',
                 }"
               >
-                {{ determineStatus(spool) }}
               </span>
             </p>
           </div>
@@ -212,7 +213,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
   spoolWeight(spool: any) {
     const weight = parseInt(spool.weight, 10);
-    return weight ? `${weight} g` : "";
+    return weight ? `${weight} g` : '';
   }
 
   private determineStatus(spool: any) {
@@ -223,24 +224,6 @@ export default class AfcPanel extends Mixins(BaseMixin) {
       return "Ready";
     }
     return "Not Ready";
-  }
-
-  private onIconStyleChange(selectedStyle: string) {
-    this.mainsailIconSwitch = false;
-    this.klipperScreenIconSwitch = false;
-    this.spoolManIconSwitch = false;
-    this.noIconSwitch = false;
-
-    // Set the selected one to true
-    if (selectedStyle === "mainsail") {
-      this.mainsailIconSwitch = true;
-    } else if (selectedStyle === "klipperscreen") {
-      this.klipperScreenIconSwitch = true;
-    } else if (selectedStyle === "spoolman") {
-      this.spoolManIconSwitch = true;
-    } else if (selectedStyle === "none") {
-      this.noIconSwitch = true;
-    }
   }
 }
 </script>
@@ -264,7 +247,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 }
 
 .unit-section {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .unit-title {
@@ -275,10 +258,10 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
 .spool-container {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 8px;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 8px;
+  padding: 4px;
 }
 
 .spool-card {
@@ -286,12 +269,13 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   border-radius: 8px;
   padding: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  max-width: 180px;
-  width: 100%;
+  flex: 1 1 calc(23% - 16px);
+  max-width: 220px; 
+  min-width: 160px; 
   position: relative;
   cursor: hand;
   transition: box-shadow 0.3s;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .spool-card:hover {
@@ -305,7 +289,11 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 }
 
 .spool-card p {
-  margin: 8px 0;
+  margin: 4px 0;
+}
+
+.spool-card h3 {
+  margin-bottom: 4px;
 }
 
 .status-light {
@@ -326,23 +314,24 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
 .hub-status {
   text-align: center;
+  margin-left: 15px 0;
 }
 
 .tool-status {
   text-align: center;
-  margin-left: 15px;
+  margin-left: 15px 0;
 }
 
-.status-text-not-ready {
-  color: red;
+.status-not-ready {
+  background-color: red;
 }
 
-.status-text-ready {
-  color: rgb(26, 230, 26);
+.status-ready {
+  background-color: rgb(26, 230, 26);
 }
 
-.status-text-in-tool {
-  color: rgb(6, 197, 245);
+.status-in-tool {
+  background-color: rgb(6, 197, 245);
 }
 
 .spool-ks {
@@ -362,4 +351,36 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   margin: 5px 0;
   color: #666;
 }
+
+@media (max-width: 1024px) {
+  .spool-card {
+    flex: 1 1 calc(30% - 16px); /* Make cards larger for medium-width screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .spool-card {
+    flex: 1 1 calc(45% - 16px); /* For narrow screens, let each card occupy more space */
+  }
+}
+
+@media (max-width: 480px) {
+  .spool-card {
+    flex: 1 1 100%; /* Stack cards vertically on small screens */
+  }
+}
+
+@media (max-width: 1200px) {
+  .spool-card {
+    flex: 1 1 calc(33% - 16px); /* Change to three items per row on smaller screens */
+  }
+}
+
+@media (max-width: 800px) {
+  .spool-card {
+    flex: 1 1 calc(50% - 16px); /* Change to two items per row for even smaller screens */
+  }
+}
+
+
 </style>
