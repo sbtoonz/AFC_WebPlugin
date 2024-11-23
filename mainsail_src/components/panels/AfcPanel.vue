@@ -28,7 +28,7 @@
                 @change="onIconStyleChange('mainsail')"
               ></v-checkbox>
             </v-list-item>-->
-            <!--<v-list-item>
+        <!--<v-list-item>
               <v-checkbox
                 v-model="klipperScreenIconSwitch"
                 label="KlipperScreen Theme"
@@ -42,7 +42,7 @@
                 @change="onIconStyleChange('spoolman')"
               ></v-checkbox>
             </v-list-item>-->
-            <!--<v-list-item>
+        <!--<v-list-item>
               <v-checkbox
                 v-model="noIconSwitch"
                 label="No Icon"
@@ -68,6 +68,16 @@
               'status-red': !getHubStatus(unitName),
             }"
           ></span>
+          <span class="tool-status">
+            <strong>Tool Status:</strong>
+            <span
+              :class="{
+                'status-light': true,
+                'status-green': toolStartSensorStatus,
+                'status-red': !toolStartSensorStatus,
+              }"
+            ></span>
+          </span>
         </div>
         <div class="spool-container" style="margin-top: 15px">
           <div
@@ -96,17 +106,15 @@
                 populate using Spoolmans
               -->
             </div>
-            <h3>Spool {{ spool.LANE }}</h3>
+            <h3>{{ spool.laneName }}</h3>
             <p v-if="spool.material">
-              <strong>Material:</strong> {{ spool.material }}
+              {{ spool.material }}
             </p>
-            <p v-if="spool.remaining_weight">
-              <strong>Remaining Weight:</strong>
-              {{ spool.remaining_weight.toFixed(2) }} g
+            <p v-if="spoolWeight(spool)">
+              {{ spoolWeight(spool) }}
             </p>
             <p>
-              <strong>Status:</strong>
-              {{ determineStatus(spool) }}
+              <!--{{ determineStatus(spool) }}-->
               <span
                 :class="{
                   'status-light': true,
@@ -213,7 +221,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
             if (
               unit.hasOwnProperty(laneKey) &&
               typeof unit[laneKey] === "object" &&
-              unit[laneKey] !== "system"
+              laneKey !== "system"
             ) {
               const laneData = unit[laneKey];
               laneData.unitName = unitName;
@@ -239,32 +247,6 @@ export default class AfcPanel extends Mixins(BaseMixin) {
     return units;
   }
 
-  private get totalPages() {
-    return Math.ceil(this.spoolData.length / this.spoolsPerPage);
-  }
-
-  private prevPage() {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-    }
-  }
-
-  private nextPage() {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-    }
-  }
-
-  private determineStatus(spool: any) {
-    if (spool.load && spool.prep) {
-      if (this.systemData && this.systemData.current_load === spool.laneName) {
-        return "In Tool";
-      }
-      return "Ready";
-    }
-    return "Not Ready";
-  }
-
   openChangeSpoolDialog(spool: any, index: number) {
     this.selectedLane = { spool, laneName: spool.laneName };
     this.showChangeSpoolDialog = true;
@@ -275,6 +257,15 @@ export default class AfcPanel extends Mixins(BaseMixin) {
       return this.unitsData[unitName].system.hub_loaded;
     }
     return this.systemData?.hub_loaded || false;
+  }
+
+  get toolStartSensorStatus() {
+    return this.systemData?.extruders?.extruder?.tool_start_sensor || false;
+  }
+
+  spoolWeight(spool: any) {
+    const weight = parseInt(spool.weight, 10);
+    return weight ? `${weight} g` : '';
   }
 
   private onIconStyleChange(selectedStyle: string) {
@@ -378,6 +369,11 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
 .hub-status {
   text-align: center;
+}
+
+.tool-status {
+  text-align: center;
+  margin-left: 15px;
 }
 
 .status-not-ready {
