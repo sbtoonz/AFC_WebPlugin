@@ -11,48 +11,7 @@
         <v-btn icon tile :title="'Refresh AFC Spools'" @click="fetchSpoolData">
           <v-icon>{{ mdiRefresh }}</v-icon>
         </v-btn>
-        <!--<v-menu :offset-y="true" :close-on-content-click="true" left>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn icon tile v-bind="attrs" v-on="on">
-              <v-icon>{{ mdiDotsVertical }}</v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item>
-              <v-list-item-title>Filament Icon Style</v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-checkbox
-                v-model="mainsailIconSwitch"
-                label="Mainsail Theme"
-                @change="onIconStyleChange('mainsail')"
-              ></v-checkbox>
-            </v-list-item>-->
-        <!--<v-list-item>
-              <v-checkbox
-                v-model="klipperScreenIconSwitch"
-                label="KlipperScreen Theme"
-                @change="onIconStyleChange('klipperscreen')"
-              ></v-checkbox>
-            </v-list-item>
-            <v-list-item>
-              <v-checkbox
-                v-model="spoolManIconSwitch"
-                label="Spoolman Theme"
-                @change="onIconStyleChange('spoolman')"
-              ></v-checkbox>
-            </v-list-item>-->
-        <!--<v-list-item>
-              <v-checkbox
-                v-model="noIconSwitch"
-                label="No Icon"
-                @change="onIconStyleChange('none')"
-              ></v-checkbox>
-            </v-list-item>
-          </v-list>
-        </v-menu>-->
       </template>
-
       <div
         v-for="(unit, unitName) in unitsData"
         :key="unitName"
@@ -93,18 +52,6 @@
                 style="width: 25%; float: right"
                 class="mr-3"
               />
-              <!-- 
-                v-if="klipperScreenIconSwitch"
-                populate using MG's CSS
-              <div
-              v-if="klipperScreenIconSwitch"
-              :class="spool">
-              </div>-->
-
-              <!-- 
-                v-if="spoolManIconSwitch"
-                populate using Spoolmans
-              -->
             </div>
             <h3>{{ spool.laneName }}</h3>
             <p v-if="spool.material">
@@ -114,15 +61,15 @@
               {{ spoolWeight(spool) }}
             </p>
             <p>
-              <!--{{ determineStatus(spool) }}-->
               <span
                 :class="{
-                  'status-light': true,
-                  'status-not-ready': determineStatus(spool) === 'Not Ready',
-                  'status-ready': determineStatus(spool) === 'Ready',
-                  'status-in-tool': determineStatus(spool) === 'In Tool',
+                  'status-text-not-ready':
+                    determineStatus(spool) === 'Not Ready',
+                  'status-text-ready': determineStatus(spool) === 'Ready',
+                  'status-text-in-tool': determineStatus(spool) === 'In Tool',
                 }"
               >
+                {{ determineStatus(spool) }}
               </span>
             </p>
           </div>
@@ -265,7 +212,7 @@ export default class AfcPanel extends Mixins(BaseMixin) {
 
   spoolWeight(spool: any) {
     const weight = parseInt(spool.weight, 10);
-    return weight ? `${weight} g` : '';
+    return weight ? `${weight} g` : "";
   }
 
   private determineStatus(spool: any) {
@@ -386,16 +333,16 @@ export default class AfcPanel extends Mixins(BaseMixin) {
   margin-left: 15px;
 }
 
-.status-not-ready {
-  background-color: red;
+.status-text-not-ready {
+  color: red;
 }
 
-.status-ready {
-  background-color: rgb(26, 230, 26);
+.status-text-ready {
+  color: rgb(26, 230, 26);
 }
 
-.status-in-tool {
-  background-color: rgb(6, 197, 245);
+.status-text-in-tool {
+  color: rgb(6, 197, 245);
 }
 
 .spool-ks {
