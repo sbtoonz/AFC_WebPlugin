@@ -16,28 +16,43 @@
           <span class="icon-refresh"></span>
         </app-btn>
       </template>
+      <div class="status-wrapper">
+        <span class="tool-status">
+          <strong>Tool Status:</strong>
+          <span
+            :class="{
+              'status-light': true,
+              'status-green': toolStartSensorStatus,
+              'status-red': !toolStartSensorStatus,
+            }"
+          ></span>
+        </span>
+        <span class="buffer-status">
+          <span v-if="systemData?.extruders?.extruder?.buffer_status">
+            {{ bufferStatus() }}
+          </span>
+        </span>
+      </div>
+
       <div
         v-for="(unit, unitName) in unitsData"
         :key="unitName"
         class="unit-section"
       >
-      <h2 class="unit-title">{{ String(unitName).replace(/_/g, " ") }}</h2>
-        <div class="hub-status">
-          <span><strong>Hub Status:</strong></span>
-          <span
-            :class="{
-              'status-light': true,
-              'status-green': getHubStatus(unitName),
-              'status-red': !getHubStatus(unitName),
-            }"
-          ></span>
-          <span class="tool-status">
-            <strong>Tool Status:</strong>
+        <div
+          class="unit-header"
+          style="display: flex; align-items: center; gap: 10px"
+        >
+          <h2 class="unit-title" style="margin: 0">
+            {{ String(unitName).replace(/_/g, " ") }}
+          </h2>
+          <span class="hub-status">
+            <span><strong>Hub Status:</strong></span>
             <span
               :class="{
                 'status-light': true,
-                'status-green': toolStartSensorStatus,
-                'status-red': !toolStartSensorStatus,
+                'status-green': getHubStatus(unitName),
+                'status-red': !getHubStatus(unitName),
               }"
             ></span>
           </span>
@@ -49,18 +64,9 @@
             class="spool-card"
           >
             <div class="filament-reel" style="padding: 1rem">
-              <v-icon
-                :color="spool.color"
-                size="60px"
-              >
-                $filament
-              </v-icon>
+              <v-icon :color="spool.color" size="60px"> $filament </v-icon>
             </div>
-            <h3>Spool: {{ spool.LANE }}</h3>
-            <p v-if="spool.material">{{ spool.material }}</p>
-            <p v-if="spool.weight">{{ spoolWeight(spool) }}</p>
-            <p>
-              {{ determineStatus(spool) }}
+            <div class="spool-header">
               <span
                 :class="{
                   'status-light': true,
@@ -70,7 +76,10 @@
                 }"
               >
               </span>
-            </p>
+              <h3>{{ spool.laneName }}</h3>
+            </div>
+            <p v-if="spool.material">{{ spool.material }}</p>
+            <p v-if="spool.weight">{{ spoolWeight(spool) }}</p>
           </div>
         </div>
       </div>
@@ -178,6 +187,10 @@ export default class AfcCard extends Mixins(StateMixin) {
     return this.systemData?.hub_loaded || false;
   }
 
+  bufferStatus() {
+    return this.systemData?.extruders?.extruder?.buffer_status || false;
+  }
+
   get toolStartSensorStatus() {
     return this.systemData?.extruders?.extruder?.tool_start_sensor || false;
   }
@@ -228,7 +241,7 @@ export default class AfcCard extends Mixins(StateMixin) {
 .unit-title {
   font-size: 1.5em;
   margin-bottom: 16px;
-  text-align: center;
+  text-align: left;
 }
 
 .spool-card {
@@ -237,33 +250,37 @@ export default class AfcCard extends Mixins(StateMixin) {
   padding: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   flex: 1 1 calc(23% - 16px);
-  max-width: 220px;
-  min-width: 160px;
+  max-width: 140px;
+  min-width: 80px;
   position: relative;
   cursor: hand;
   transition: box-shadow 0.3s;
   margin-bottom: 8px;
+  text-align: right;
 }
 
 .filament-reel {
   position: absolute;
-  top: -20px;
-  right: -20px;
+  bottom: -10px;
+  left: -10px;
 }
 
 .spool-card p {
   margin: 4px 0;
 }
 
-.pagination-controls {
+.spool-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 16px 0;
-}
-
-.pagination-controls span {
-  margin: 0 16px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .status-light {
@@ -283,7 +300,7 @@ export default class AfcCard extends Mixins(StateMixin) {
 }
 
 .hub-status {
-  text-align: center;
+  text-align: left;
   margin-left: 15px 0;
 }
 
