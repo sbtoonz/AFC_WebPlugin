@@ -33,7 +33,6 @@
           </span>
         </span>
       </div>
-
       <div
         v-for="(unit, unitName) in unitsData"
         :key="unitName"
@@ -41,7 +40,7 @@
       >
         <div
           class="unit-header"
-          style="display: flex; align-items: center; gap: 10px"
+          style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 15px;"
         >
           <h2 class="unit-title" style="margin: 0">
             {{ String(unitName).replace(/_/g, " ") }}
